@@ -1,0 +1,12 @@
+# comandos para criar a venv e rodar o projeto usando comandos do terminal windows
+# python -m venv venv
+# venv\Scripts\activate
+# pip install flask
+# python run.py
+
+# comandos para criar a venv e rodar o projeto usando comandos do terminal linux
+# python3 -m venv venv
+# source venv/bin/activate
+# pip install flask
+
+quero que analise todo o projeto e seguindo a estrutura das pastas quero que esse sistema tenha um banco de dados em sqlite, a rotas estao na pasta routes, a logica dos templates e das ações no main, a logica de login no utils, o banco na pasta db, quero que ajuste os templates do analista e do gestor para incluirem suas funções agora com python e um banco e nao altere nada nos templates de teste.html pois eles sao apenas uma copia, o login do gestor é email: gestor@sicredi.com senha: gestor2025, os analistas so podem logar com os dados que o gestor criar, comente em todos os codigos python para eu entender o que cada função faz
