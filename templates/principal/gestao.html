@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sicredi - Sistema de Gestão</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/principal/gestao.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">  
+      <!-- mude a linkagem para jinja flask -->
+      <img src="{{ url_for('static', filename='img/sicredi.jpeg') }}" alt="Logo Sicredi" class="logo">
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li class="active"><a href="#"><i class="fas fa-home"></i> <span>Início</span></a></li>
+        <li><a href="#"><i class="fas fa-file-alt"></i> <span>Documentos</span></a></li>
+        <li><a href="#"><i class="fas fa-box"></i> <span>Materiais</span></a></li>
+        {% if session.user_type == 'G' %}
+        <li><a href="#"><i class="fas fa-bullhorn"></i> <span>Avisos</span></a></li>
+        {% endif %}
+        <li><a href="#"><i class="fas fa-chart-line"></i> <span>Relatórios</span></a></li>
+        {% if session.user_type == 'G' %}
+        <li><a href="#"><i class="fas fa-users"></i> <span>Equipe</span></a></li>
+        {% endif %}
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{{ url_for('logout') }}" class="botao-sair"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <header class="cabecalho">
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-details">
+          <h3>Olá, Cooperado!</h3>
+          <p>Bem-vindo ao Sistema de Gestão</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="search-box">
+          <input type="text" placeholder="Pesquisar...">
+          <button><i class="fas fa-search"></i></button>
+        </div>
+        <div class="notification">
+          <i class="fas fa-bell"></i>
+          <span class="badge">3</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-stats">
+      <!-- Card de Documentos -->
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="stat-info">
+          <h3>128</h3>
+          <p>Documentos</p>
+        </div>
+        <div class="stat-progress">
+          <div class="progress-bar" style="width: 75%;"></div>
+        </div>
+      </div>
+      
+      <!-- Card de Materiais -->
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-info">
+          <h3>85</h3>
+          <p>Materiais</p>
+        </div>
+        <div class="stat-progress">
+          <div class="progress-bar" style="width: 60%;"></div>
+        </div>
+      </div>
+      
+      <!-- Card de Avisos (apenas para gestor) -->
+      {% if session.user_type == 'G' %}
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-bullhorn"></i>
+        </div>
+        <div class="stat-info">
+          <h3>12</h3>
+          <p>Avisos</p>
+        </div>
+        <div class="stat-progress">
+          <div class="progress-bar" style="width: 40%;"></div>
+        </div>
+      </div>
+      {% endif %}
+      
+      <!-- Card de Tarefas -->
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-tasks"></i>
+        </div>
+        <div class="stat-info">
+          <h3>24</h3>
+          <p>Tarefas</p>
+        </div>
+        <div class="stat-progress">
+          <div class="progress-bar" style="width: 85%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Acesso Rápido</h2>
+    
+    <main class="painel-gestao">
+      <!-- Cartão de Painel de Avisos (Apenas para administradores) -->
+      {% if session.user_type == 'G' %}
+      <a href="#" class="opcao-gestao">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-bullhorn"></i>
+          </div>
+          <div class="card-badge">Novo</div>
+        </div>
+        <h2>Painel de Avisos</h2>
+        <p>Gerencie e publique avisos importantes para a equipe</p>
+        <div class="card-footer">
+          <span>Acessar agora</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
+      {% endif %}
+      
+      <!-- Cartão de Gestão de Documentos -->
+      <a href="#" class="opcao-gestao">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div class="card-badge">Novo</div>
+        </div>
+        <h2>Gestão de Documentos</h2>
+        <p>Acesse, organize e gerencie todos os documentos do sistema</p>
+        <div class="card-footer">
+          <span>Acessar agora</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
+      
+      <!-- Cartão de Monitoramento de Materiais -->
+      <a href="#" class="opcao-gestao">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-box"></i>
+          </div>
+        </div>
+        <h2>Monitoramento de Materiais</h2>
+        <p>Acompanhe o estoque e a movimentação de materiais</p>
+        <div class="card-footer">
+          <span>Acessar agora</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
+
+      
+    </main>
+
+    <div class="recent-activity">
+      <div class="activity-header">
+        <h2 class="section-title">Atividades Recentes</h2>
+        <a href="#" class="view-all">Ver todas</a>
+      </div>
+      
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-file-upload"></i>
+          </div>
+          <div class="activity-details">
+            <h4>Documento adicionado</h4>
+            <p>Relatório mensal foi adicionado à biblioteca</p>
+            <span class="activity-time">Há 2 horas</span>
+          </div>
+        </div>
+        
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-user-edit"></i>
+          </div>
+          <div class="activity-details">
+            <h4>Perfil atualizado</h4>
+            <p>Informações do usuário foram atualizadas</p>
+            <span class="activity-time">Há 5 horas</span>
+          </div>
+        </div>
+        
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="activity-details">
+            <h4>Novo aviso publicado</h4>
+            <p>Aviso sobre manutenção do sistema</p>
+            <span class="activity-time">Há 1 dia</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="rodape">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="https://www.sicredi.com.br/assets/logotipos/sicredi.svg" alt="Logo Sicredi" class="logo">
+      </div>
+      <div class="footer-copyright">
+        <p>© 2023 Sicredi - Cooperativa de Crédito. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

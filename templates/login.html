@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Sicredi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/principal/login.css') }}">
+</head>
+<body>
+    <div class="container-login">
+        <img class="logo-login" src="{{ url_for('static', filename='img/sicredi.jpeg') }}" alt="Sicredi Logo">
+        <div class="titulo-login">Acesse sua conta</div>
+        
+        <!-- Mensagens Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('login') }}" class="formulario-login" autocomplete="off">
+            <div class="grupo-input">
+                <input type="text" class="entrada-login" id="usuario" name="usuario" placeholder=" " required>
+                <label for="usuario">E-mail</label>
+            </div>
+            <div class="grupo-input">
+                <input type="password" class="entrada-login" id="senha" name="senha" placeholder=" " required>
+                <label for="senha">Senha</label>
+                <button type="button" class="alternar-senha" aria-label="Mostrar ou ocultar senha"></button>
+            </div>
+            <a href="#" class="link-esqueci">Esqueci minha senha</a>
+            <div class="acoes-login">
+                <button type="submit" class="botao-login">
+                    Entrar 
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
