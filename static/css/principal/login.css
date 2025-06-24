@@ -1,0 +1,217 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: #f7f7f7;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-login {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 40px 32px 32px 32px;
+    min-width: 340px;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo-login {
+    width: 15rem;
+    margin-bottom: 3rem;
+}
+
+.titulo-login {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 3rem;
+    color: #333;
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.formulario-login {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.grupo-input {
+    position: relative;
+    width: 80%;
+    margin-bottom: 20px;
+  }
+  
+  .entrada-login {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fafafa;
+    outline: none;
+  }
+  
+  .grupo-input label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fafafa;
+    padding: 0 4px;
+    color: #999;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: 0.2s ease;
+  }
+  
+  .entrada-login:focus + label,
+  .entrada-login:not(:placeholder-shown) + label {
+    top: -8px;
+    left: 10px;
+    background-color: transparent;
+    font-size: 0.75rem;
+    color: #8bc34a;
+  }
+
+.entrada-login:focus,
+.entrada-login:not(:placeholder-shown) {
+    border: none;
+    box-shadow: none;
+}
+
+  
+
+.entrada-login {
+    width: 100%;
+    padding: 12px 44px 12px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fafafa;
+    color: #333;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.entrada-login:focus {
+    border-color: #8bc34a;
+}
+
+.alternar-senha {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #888;
+}
+
+.link-esqueci {
+    display: block;
+    text-align: right;
+    margin-top: -12px;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.link-esqueci:hover {
+    color: #8bc34a;
+}
+
+.acoes-login {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+
+.botao-login {
+    background: #8bc34a;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+#Seta-botao{
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.botao-login:hover {
+    background: #76a73f;
+}
+
+.icone-seta {
+    font-size: 1.2rem;
+}
+
+.botao-secundario {
+    background: #fff;
+    color: #333;
+    border: 2px solid #222;
+    border-radius: 8px;
+    padding: 10px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border 0.2s;
+}
+
+.botao-secundario:hover {
+    background: #f7f7f7;
+    border-color: #76a73f;
+}
+
+@media (max-width: 400px) {
+    .container-login {
+        padding: 24px 8px;
+        min-width: unset;
+    }
+}
+
+/* Estilos para mensagens de alerta */
+.alert {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    width: 80%;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.alert-error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.alert-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
