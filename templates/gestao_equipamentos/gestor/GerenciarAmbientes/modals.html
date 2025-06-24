@@ -1,0 +1,81 @@
+<!-- ========== MENU LATERAL (MODAL) ========== -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+<div id="sidebar-menu" class="fixed top-0 left-0 h-full w-72 bg-white shadow-xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="flex items-center justify-between p-4 border-b">
+        <div class="flex items-center flex-shrink-0">
+             <img class="h-8 w-auto" src="/static/img/logo-verde.png" alt="Logo Sicredi"
+            onerror="this.onerror=null; this.src='https://placehold.co/150x40/000000/ffffff?text=Sicredi';">
+             <span class="ml-3 font-semibold text-lg text-gray-800">Sicredi</span>
+        </div>
+        <button id="close-menu-btn" class="p-2 rounded-full hover:bg-gray-200">
+            <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+    <nav class="p-4">
+        <ul>
+            <li><a href="{{ url_for('reservas') }}" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100"><span class="ml-3">Reserva de Equipamentos</span></a></li>
+            <li><a href="{{ url_for('imobilizados') }}" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100"><span class="ml-3">Gestão de Imobilizado</span></a></li>
+            <li><a href="{{ url_for('ambientes') }}" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100"><span class="ml-3">Controle de Acessos</span></a></li>
+            <li><a href="{{ url_for('mobilizados') }}" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100"><span class="ml-3">Gestão de Mobilizado</span></a></li>
+        </ul>
+    </nav>
+</div>
+
+<!-- ========== MODAL NOVO AMBIENTE ========== -->
+<div id="add-environment-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+<div id="add-environment-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 w-full max-w-md hidden">
+    <form id="add-environment-form">
+        <div class="flex items-center justify-between p-4 border-b">
+            <h3 class="text-xl font-semibold text-gray-800">Adicionar Novo Ambiente</h3>
+            <button type="button" id="close-add-modal-btn" class="p-2 rounded-full hover:bg-gray-200">
+                 <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="p-6">
+            <div class="mb-4">
+                <label for="ambiente-nome" class="block text-sm font-medium text-gray-700 mb-1">Nome do Ambiente</label>
+                <input type="text" id="ambiente-nome" name="ambiente-nome" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#3b8114] focus:border-[#3b8114]" placeholder="Ex: Sala de Reuniões 1" required>
+            </div>
+            <div class="mb-4">
+                 <label class="block text-sm font-medium text-gray-700 mb-2">Usuários com Acesso</label>
+                 <div class="max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-2">
+                    <div class="flex items-center">
+                        <input id="user-1" name="users" type="checkbox" class="h-4 w-4 text-[#3b8114] focus:ring-[#326d11] border-gray-300 rounded" value="José da Silva (Analista)">
+                        <label for="user-1" class="ml-3 text-sm text-gray-700">José da Silva (Analista)</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="user-2" name="users" type="checkbox" class="h-4 w-4 text-[#3b8114] focus:ring-[#326d11] border-gray-300 rounded" value="Maria Oliveira (Gestora)">
+                        <label for="user-2" class="ml-3 text-sm text-gray-700">Maria Oliveira (Gestora)</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="user-3" name="users" type="checkbox" class="h-4 w-4 text-[#3b8114] focus:ring-[#326d11] border-gray-300 rounded" value="Carlos Pereira (Analista)">
+                        <label for="user-3" class="ml-3 text-sm text-gray-700">Carlos Pereira (Analista)</label>
+                    </div>
+                 </div>
+            </div>
+        </div>
+        <div class="flex items-center justify-end p-4 border-t bg-gray-50 rounded-b-lg">
+            <button id="cancel-add-modal-btn" type="button" class="bg-white hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm mr-2">
+                Cancelar
+            </button>
+            <button type="submit" class="bg-[#3b8114] hover:bg-[#326d11] text-white font-semibold py-2 px-4 rounded-lg shadow-md">
+                Salvar Ambiente
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- ========== MODAL DE CONFIRMAÇÃO DE EXCLUSÃO ========== -->
+<div id="delete-confirm-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+<div id="delete-confirm-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 w-full max-w-sm hidden">
+    <div class="p-6 text-center">
+        <svg class="mx-auto mb-4 h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        <h3 class="mb-5 text-lg font-normal text-gray-600">Tem certeza que deseja excluir este ambiente?</h3>
+        <button id="confirm-delete-btn" type="button" class="text-white bg-red-600 hover:bg-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+            Sim, tenho certeza
+        </button>
+        <button id="cancel-delete-btn" type="button" class="text-gray-500 bg-white hover:bg-gray-100 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900">
+            Cancelar
+        </button>
+    </div>
+</div>

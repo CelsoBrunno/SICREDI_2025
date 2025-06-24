@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo_pagina or 'Solicitar Reserva - Sicredi' }}</title>
+    
+    <!-- Importação do Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Importação da fonte 'Inter' do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Importação do arquivo CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Analista/ReservaEquipamento/style.css') }}">
+
+</head>
+<body>
+
+    <!-- link para o header -->
+    {% include 'Analista/ReservaEquipamento/header.html' %}
+    
+    <!-- link para os modals -->
+    {% include 'Analista/ReservaEquipamento/modals.html' %}
+
+    
+    
+
+    <!-- O conteúdo da página virá aqui -->
+    <main class="p-4 sm:p-6 lg:p-8">
+        {% block conteudo %}
+        <!-- link para a section de solicitar reserva -->
+        {% include 'Analista/ReservaEquipamento/section_solicitarReserva.html' %}
+        <!-- link para a section de listar reserva -->
+        {% include 'Analista/ReservaEquipamento/section_listarReserva.html' %}
+        {% endblock %}
+    </main>
+
+    <!-- ========== SCRIPTS EM LINKAGEM FLASK ========== -->
+    <script src="{{ url_for('static', filename='js/Analista/ReservaEquipamento/script.js') }}"></script>
+
+
+</body>
+</html>
