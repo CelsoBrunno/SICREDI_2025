@@ -17,10 +17,13 @@
     <nav class="sidebar-nav">
       <ul>
         <li class="active"><a href="#"><i class="fas fa-home"></i> <span>Início</span></a></li>
-        <li><a href="#"><i class="fas fa-file-alt"></i> <span>Documentos</span></a></li>
+        <li><a href="{{ url_for('analista.documentos_pendentes') }}"><i class="fas fa-file-alt"></i> <span>Documentos</span></a></li>
         <li><a href="#"><i class="fas fa-box"></i> <span>Materiais</span></a></li>
         {% if session.user_type == 'G' %}
         <li><a href="#"><i class="fas fa-bullhorn"></i> <span>Avisos</span></a></li>
+        <li><a href="{{ url_for('gestor_ambientes.pagina_ambientes') }}"><i class="fas fa-building"></i> <span>Gerenciar Ambientes</span></a></li>
+        <li><a href="{{ url_for('analistas.pagina_analistas') }}"><i class="fas fa-user-tie"></i> <span>Gerenciar Analistas</span></a></li>
+        <li><a href="{{ url_for('bp_gestor_equipamentos.pagina_mobilizados') }}"><i class="fas fa-box"></i> <span>Monitoramento de Materiais</span></a></li>
         {% endif %}
         <li><a href="#"><i class="fas fa-chart-line"></i> <span>Relatórios</span></a></li>
         {% if session.user_type == 'G' %}
@@ -135,10 +138,56 @@
           <i class="fas fa-arrow-right"></i>
         </div>
       </a>
+      <!-- Card: Ambientes (Gestor e Analista) -->
+      <a href="{{ url_for('gestor_ambientes.pagina_ambientes') }}" class="opcao-gestao">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-building"></i>
+          </div>
+          <div class="card-badge">Novo</div>
+        </div>
+        <h2>Ambientes</h2>
+        <p>Visualize e acesse os ambientes disponíveis</p>
+        <div class="card-footer">
+          <span>Acessar agora</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
+      {% if session.user_type == 'G' %}
+      <!-- Card: Gerenciar Analistas (apenas para gestor) -->
+      <a href="{{ url_for('analistas.pagina_analistas') }}" class="opcao-gestao">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-user-tie"></i>
+          </div>
+          <div class="card-badge">Novo</div>
+        </div>
+        <h2>Gerenciar Analistas</h2>
+        <p>Gerencie os analistas cadastrados no sistema</p>
+        <div class="card-footer">
+          <span>Acessar agora</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
+      {% endif %}
+      <!-- Card: Equipamentos Mobilizados (todos) -->
+      <a href="{{ url_for('bp_gestor_equipamentos.pagina_mobilizados') }}" class="opcao-gestao">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-box"></i>
+          </div>
+        </div>
+        <h2>Equipamentos Mobilizados</h2>
+        <p>Acompanhe o estoque e a movimentação de materiais</p>
+        <div class="card-footer">
+          <span>Acessar agora</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
       {% endif %}
       
       <!-- Cartão de Gestão de Documentos -->
-      <a href="#" class="opcao-gestao">
+      <a href="{{ url_for('gestor.documentos_pendentes') if session.user_type == 'G' else url_for('analista.documentos_pendentes') }}" class="opcao-gestao">
         <div class="card-header">
           <div class="card-icon">
             <i class="fas fa-file-alt"></i>
