@@ -108,7 +108,7 @@ body {
 .alternar-senha {
     position: absolute;
     top: 50%;
-    right: 12px;
+    right: -50px;
     transform: translateY(-50%);
     background: none;
     border: none;
@@ -117,20 +117,6 @@ body {
     color: #888;
 }
 
-.link-esqueci {
-    display: block;
-    text-align: right;
-    margin-top: -12px;
-    margin-bottom: 8px;
-    font-size: 0.95rem;
-    color: #666;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-.link-esqueci:hover {
-    color: #8bc34a;
-}
 
 .acoes-login {
     display: flex;

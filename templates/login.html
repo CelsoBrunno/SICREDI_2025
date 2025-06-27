@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Sicredi</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/principal/login.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container-login">
@@ -29,9 +31,10 @@
             <div class="grupo-input">
                 <input type="password" class="entrada-login" id="senha" name="senha" placeholder=" " required>
                 <label for="senha">Senha</label>
-                <button type="button" class="alternar-senha" aria-label="Mostrar ou ocultar senha"></button>
+                <button type="button" class="alternar-senha" aria-label="Mostrar ou ocultar senha">
+                    <i class="fa-solid fa-eye"></i>
+                </button>
             </div>
-            <a href="#" class="link-esqueci">Esqueci minha senha</a>
             <div class="acoes-login">
                 <button type="submit" class="botao-login">
                     Entrar 
@@ -39,5 +42,23 @@
             </div>
         </form>
     </div>
+
+    <script>
+        const btn = document.querySelector('.alternar-senha');
+        const inputSenha = document.getElementById('senha');
+        const icon = btn.querySelector('i');
+
+        btn.addEventListener('click', () => {
+            if (inputSenha.type === 'password') {
+                inputSenha.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                inputSenha.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
 </body>
 </html>
