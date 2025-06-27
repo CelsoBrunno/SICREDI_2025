@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sicredi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/gestao_documentos/gestor/gestor_documentos_reprovados/gestor_documentos.css') }}">
+  <link rel="icon" href="{{url_for ('static', filename='img/logo-verde.png')}}" type="image/x-icon">
+</head>
+<body>
+
+   {% include 'gestao_documentos/gestor/gestor_documentos_reprovados/header.html' %}
+   {% include 'gestao_documentos/gestor/gestor_documentos_reprovados/modals.html' %}
+
+  <main>
+    <h2 class="gestor_documentos_titulo">Documentos Reprovados</h2>
+   
+    <table class="gestor_documentos_tabela">
+      <thead class="gestor_documentos_tabela_titulos">
+        <td>Título</td>
+        <td>Analista</td>
+        <td>Data</td>
+        <td>Motivo</td>
+      </thead>
+
+      <tbody class="gestor_documentos_tabela_dados">
+        {% if documentos %}
+          {% for documento in documentos %}
+          <tr>
+            <td>{{ documento.titulo }}</td>
+            <td>{{ documento.nome_analista }}</td>
+            <td>{{ documento.data_envio.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>{{ documento.motivo_rejeicao or 'Nenhum motivo informado' }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="4">Nenhum documento reprovado encontrado</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </main>
+
+  <script src="{{url_for('static',filename='js/gestao_documentos/gestor/gestor_documentos_pendentes/menu.js')}}"></script>
+  <script src="{{url_for('static',filename='js/gestao_documentos/gestor/gestor_documentos_pendentes/index.js')}}"></script>
+</body>
+</html>

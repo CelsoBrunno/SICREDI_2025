@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sicredi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/gestao_documentos/analista/analista_documentos_pendentes/style.css') }}">
+  <link rel="icon" href="{{url_for ('static', filename='img/logo-verde.png')}}" type="image/x-icon">
+</head>
+<body>
+
+   {% include 'gestao_documentos/analista/analista_documentos_cadastrar/header.html' %}
+   {% include 'gestao_documentos/analista/analista_documentos_cadastrar/modals.html' %}
+
+  <main>
+    <h2 class="gestor_documentos_titulo">Documentos Pendentes</h2>
+   
+    <table class="gestor_documentos_tabela">
+      <thead class="gestor_documentos_tabela_titulos">
+        <td>Título</td>
+        <td>Analista</td>
+        <td>Data</td>
+        <td>Valor Emprestimo</td>
+        <td>Prazo Financiamento</td>
+        <td>Valor Total Sicredi</td>
+
+      </thead>
+
+      <tbody class="gestor_documentos_tabela_dados">
+        {% if documentos %}
+          {% for documento in documentos %}
+          <tr>
+            <td class="gestor_documentos_tabela_acoes_titulos" >{{ documento.titulo }}</td>
+            <td>{{ documento.nome_analista }}</td>
+            <td>{{ documento.data_envio.strftime('%d/%m/%Y') }}</td>
+            <td>{{ documento.valor_emprestimo }}</td>
+            <td>{{ documento.prazo_financiamento }}</td>
+            <td>{{ documento.valor_total_sicredi }}</td>
+          </tr>
+          {% endfor %}
+          
+          {% else %}
+            <tr>
+              <td colspan="6">Nenhum documento pendente encontrado</td>
+            </tr>
+        {% endif %}
+      </tbody>
+    </table>
+
+  </main>
+
+  <script src="{{url_for('static',filename='js/gestao_documentos/analista/analista_documentos_cadastrar/menu.js')}}"></script>
+  
+</body>
+</html>

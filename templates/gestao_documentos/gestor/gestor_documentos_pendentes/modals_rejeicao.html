@@ -1,0 +1,33 @@
+<!-- ========== MODAL DE REJEIÇÃO ========== -->
+{% for documento in documentos %}
+<div id="modalRejeicao{{ documento.id_documento }}" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden">
+    <div class="fixed inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md transform transition-all">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-medium">Rejeitar Documento</h3>
+                <button class="text-gray-400 hover:text-gray-500" onclick="fecharModalRejeicao({{ documento.id_documento }})">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <form action="{{ url_for('gestor.gestor_reprovar_documento', documento_id=documento.id_documento) }}" method="POST">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Motivo da rejeição:</label>
+                        <textarea name="motivo_rejeicao" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" rows="4" required></textarea>
+                    </div>
+                    <div class="mt-4 flex justify-end space-x-3">
+                        <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onclick="fecharModalRejeicao({{ documento.id_documento }})">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Rejeitar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

@@ -28,4 +28,3 @@ def init_db():
     avisos_internos()
     gestao_documentos()
 
-init_db()

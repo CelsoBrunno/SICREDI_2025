@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sicredi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/gestao_documentos/analista/analista_documentos_cadastrar/style.css')}}">
+</head>
+
+<body>
+    
+    {% include 'gestao_documentos/analista/analista_documentos_cadastrar/header.html' %}
+    {% include 'gestao_documentos/analista/analista_documentos_cadastrar/modals.html' %}
+
+    <main class="principal">
+        <h1 class="principal_titulo_cadastro">Cadastro do Cliente</h1>
+
+        <form action="{{ url_for('analista.documentos_cadastrar') }}" method="post" class="principal_form_cadastro">
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="CPF">CPF:</label>
+                <input type="text" id="CPF" name="CPF" required maxlength="11" placeholder="000.000.000-00" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="Estabelecimento">Local do Estabelecimento:</label>
+                <input type="text" id="Estabelecimento" name="Estabelecimento" required class="form-input">
+            </div>
+
+            <h1 class="principal_titulo_Taxas">Dados Financeiros</h1>
+
+            <div class="financeiro-container">
+                <div class="input-group">
+                    <label for="valor_emprestimo">Digite o valor do empréstimo(R$):</label>
+                    <input type="number" id="valor_emprestimo" name="valor_emprestimo" min="0" step="0.01" placeholder="0.00" class="financeiro-input" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="prazo_financiamento">Escolha o prazo do financiamento:</label><br>
+                    <select id="prazo_financiamento" name="prazo_financiamento" class="financeiro-select" required>
+                        <option value="12">12x</option>
+                        <option value="24">24x</option>
+                        <option value="36">36x</option>
+                        <option value="48">48x</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="banco"></label>
+                    <div class="nome_bancos">
+                        <select id="banco" name="banco" class="banco-select" required>
+                            <option value="0.03">BRB (3%)</option>
+                            <option value="0.017">Inter (1.7%)</option>
+                            <option value="0.05">Itaú (5%)</option>
+                            <option value="0.06">Nubank (6%)</option>
+                            <option value="0.07">Santander (7%)</option>
+                        </select>
+                        <span class="banco_sicredi">Sicredi</span>
+                    </div>
+                </div>
+
+                <div class="titulos">
+                    <h4>Juros <span id="banco-nome">Banco</span></h4>
+                    <h3 class="titulos_sicredi">Juros Sicredi (1.5%)</h3>
+                </div>
+                
+                <div class="resultado-container">
+                    <div class="resultado-coluna">
+                        <h4>Parcela no <span id="banco-nome-parcela">Banco</span>:</h4>
+                        <div class="valor-destaque" id="valor-parcela-banco">R$ 0.00</div>
+                    </div>
+                    <div class="resultado-coluna">
+                        <h4>Parcela na Sicredi:</h4>
+                        <div class="valor-destaque" id="valor-parcela-sicredi">R$ 0.00</div>
+                    </div>
+                </div>
+
+                <div class="resultado-container">
+                    <div class="resultado-coluna">
+                        <h4>Valor total com o <span id="banco-nome-total">Banco</span>:</h4>
+                        <div class="valor-destaque" id="valor-taxa-banco">R$ 0.00</div>
+                    </div>
+                    <div class="resultado-coluna">
+                        <h4>Valor total com a Sicredi:</h4>
+                        <div class="valor-destaque" id="valor-taxa-sicredi">R$ 0.00</div>
+                    </div>
+            </div>
+
+            <button type="submit" class="form-submit">Cadastrar</button>
+        </form>
+        
+        <script src="{{url_for('static',filename='js/gestao_documentos/analista/analista_documentos_cadastrar/index.js')}}"></script>
+        <script src="{{url_for('static',filename='js/gestao_documentos/analista/analista_documentos_cadastrar/menu.js')}}"></script>
+    </main>
+</body>
+</html>

@@ -1,0 +1,289 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  background-color: #f3f4f6; 
+}
+
+
+.principal_titulo_cadastro {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 24px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Container do Formulário */
+.principal_form_cadastro {
+max-width: 600px;
+margin: 0 auto;
+padding: 20px;
+background-color: #f9f9f9;
+border-radius: 8px;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Grupos de Campos */
+.form-group {
+margin-bottom: 15px;
+}
+
+.form-group label {
+display: block;
+margin-bottom: 5px;
+font-weight: 500;
+color: #34495e;
+}
+
+/* Inputs */
+.form-input {
+width: 100%;
+padding: 10px 12px;
+border: 1px solid #ddd;
+border-radius: 4px;
+font-size: 16px;
+transition: border 0.3s;
+}
+
+.form-input:focus {
+border-color: #3498db;
+outline: none;
+box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Input de Arquivo */
+.form-input-file {
+width: 100%;
+padding: 10px 0;
+}
+
+/* Botão de Submit */
+.form-submit {
+display: block;
+width: 500px;
+padding: 12px;
+background-color: #3FA110;
+color: white;
+border: none;
+border-radius: 4px;
+font-size: 16px;
+font-weight: 500;
+cursor: pointer;
+transition: background 0.3s;
+justify-content: center;
+margin: 20px auto 0;
+
+
+}
+
+.form-submit:hover {
+background-color: #1b8e52;
+}
+
+/* Placeholder do CPF */
+#CPF::placeholder {
+color: #95a5a6;
+opacity: 1;
+}
+
+/* .principal_titulo_Taxas{
+
+} */
+
+/* Estilos gerais */
+.principal_titulo_Taxas {
+margin-top: 60px;
+text-align: center;
+margin-bottom: 20px;
+font-size: 24px;
+color: #333;
+}
+
+.principal_container {
+display: flex;
+flex-direction: column;
+gap: 10px;
+max-width: 600px;
+margin: 0 auto;
+}
+
+.principal_linha {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 10px;
+}
+
+/* Estilo das boxes */
+.principal_box_emprestimo,
+.principal_box_sicredi,
+.principal_box_taxas,
+.principal_box_taxas_sicredi {
+padding: 10px 15px;
+background-color: #f0f0f0;
+border-radius: 5px;
+font-weight: bold;
+text-align: center;
+flex: 1;
+}
+
+.principal_box_valor {
+flex: 1;
+display: flex;
+flex-direction: column;
+gap: 5px;
+}
+
+.principal_box_valor input {
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+font-size: 16px;
+}
+
+.principal_select {
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+font-size: 16px;
+flex: 1;
+background-color: white;
+}
+
+.titulos{
+display: flex;
+justify-content: space-between;
+}
+
+.titulos_sicredi{
+margin-right: 80px;
+}
+
+/* Estilos para a seção financeira */
+.financeiro-container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.financeiro-input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.financeiro-select{
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.banco-select {
+  width: 40%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.financeiro-input:focus, .financeiro-select:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+
+
+.titulos_sicredi {
+  color: #3FA110; /* Cor do Sicredi */
+}
+
+.parcelamento-titulo {
+  color: #343a40;
+  margin: 15px 0;
+  font-size: 18px;
+}
+
+.resultado-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+  background-color: white;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.resultado-coluna {
+  width: 48%;
+}
+
+.valor-destaque {
+  font-size: 20px;
+  font-weight: bold;
+  color: #3FA110;
+  margin-top: 5px;
+}
+
+h4 {
+  margin: 0 0 5px 0;
+  color: #495057;
+  font-size: 16px;
+}
+
+.banco_sicredi{
+  font-size: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  margin-right: 45px;
+  border: 1px solid #ced4da;
+  background-color: white;
+  border-radius: 3px;
+  padding: 6px;
+  width: 40%;
+  align-content: center;
+  text-align: center;
+}
+
+.nome_bancos{
+  display: flex;
+  justify-content: space-between;
+}
+
+.alert {
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  text-align: center;
+}
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}

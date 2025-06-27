@@ -21,27 +21,22 @@ def gestao_documentos():
                 id_documento INTEGER PRIMARY KEY AUTOINCREMENT,
                 titulo VARCHAR(255) NOT NULL,
                 descricao TEXT,
-                arquivo_url TEXT,
-                tipo_arquivo VARCHAR(50),
                 status VARCHAR(20) CHECK(status IN ('P', 'AN', 'AP', 'R')) NOT NULL, -- P - PENDENTE / AN - ANALISE / AP - APROVADO / R - REJEITADO.
                 data_envio TIMESTAMP,
                 id_responsavel INT,
                 id_processo INT,
                 nivel_aprovacao_atual SMALLINT,
+                motivo_rejeicao TEXT,
+                valor_emprestimo DECIMAL(10,2),
+                prazo_financiamento INT,
+                valor_total_sicredi DECIMAL(10,2),
                 FOREIGN KEY (id_responsavel) REFERENCES usuarios(id_usuario),
                 FOREIGN KEY (id_processo) REFERENCES processos(id_processo)
             );
         ''')
         print("Tabela 'documentos' criada com sucesso ou já existente.")
 
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS bancos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL,
-                taxa REAL
-            );
-         ''')
-        print("Tabela 'bancos' criada com sucesso ou já existente.")
+
 
 
 
