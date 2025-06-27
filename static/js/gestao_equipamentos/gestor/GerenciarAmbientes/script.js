@@ -53,7 +53,33 @@ const closeAddEnvironmentModal = () => {
     addEnvironmentForm.reset(); 
 };
 
-addEnvironmentBtn.addEventListener('click', openAddEnvironmentModal);
+addEnvironmentBtn.addEventListener('click', () => {
+    // Buscar setores ao abrir o modal
+    const container = document.getElementById('setores-container');
+    container.innerHTML = '<span class="text-gray-400 text-sm">Carregando...</span>';
+    fetch('/gerenciar_analistas/api/setores')
+        .then(res => res.json())
+        .then(setores => {
+            container.innerHTML = '';
+            if (setores.length === 0) {
+                container.innerHTML = '<span class="text-gray-400 text-sm">Nenhum setor cadastrado.</span>';
+            } else {
+                setores.forEach(setor => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center';
+                    div.innerHTML = `
+                        <input id="setor-${setor.id_setor}" name="setores" type="checkbox" class="h-4 w-4 text-[#3b8114] focus:ring-[#326d11] border-gray-300 rounded" value="${setor.id_setor}">
+                        <label for="setor-${setor.id_setor}" class="ml-3 text-sm text-gray-700">${setor.nome_setor}</label>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        })
+        .catch(() => {
+            container.innerHTML = '<span class="text-red-500 text-sm">Erro ao carregar setores.</span>';
+        });
+    openAddEnvironmentModal();
+});
 closeAddModalBtn.addEventListener('click', closeAddEnvironmentModal);
 cancelAddModalBtn.addEventListener('click', closeAddEnvironmentModal);
 addEnvironmentOverlay.addEventListener('click', closeAddEnvironmentModal);
