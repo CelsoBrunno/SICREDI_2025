@@ -9,8 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 # Importar módulos do projeto
 
 from app.utils.auth import login_user, logout_user, login_required, gestor_required, analista_required, get_current_user
-from app.main.gestao_equipamentos.gestor import GestorService
-from app.main.gestao_equipamentos.analista import AnalistaService
+
 from app.db.database import init_db, hash_password, check_password
 from app.db.db_connection import get_db_connection
 # Inicializar aplicação Flask
@@ -45,25 +44,21 @@ print(f"Pasta de estáticos definida para: {app.static_folder} (url: {app.static
 with app.app_context():
     init_db()  # Isso criará as tabelas e os usuários padrão se não existirem
 
-# Instanciar serviços
-gestor_service = GestorService()
-analista_service = AnalistaService()
+# Instanciadores removidos: GestorService e AnalistaService não existem mais.
 
 # ===== ROTAS PRINCIPAIS =====
 
 @app.route('/')
 def index():
     """
-    Rota principal - redireciona para login se não autenticado
-    ou para a página de gestão se autenticado
+    Rota principal corrigida: exibe SEMPRE a tela de login se o usuário não estiver autenticado.
+    Se autenticado, redireciona para a dashboard de gestão.
     """
     print('\n=== ACESSANDO ROTA RAIZ ===')
     print(f'Sessão atual: {dict(session)}')
-    
     if 'user_id' in session:
         print(f'Usuário autenticado. Redirecionando para a página de gestão...')
         return redirect(url_for('gestao'))
-    
     print('Usuário não autenticado. Exibindo página de login...')
     return render_template('login.html')
 
@@ -73,12 +68,12 @@ def login():
     print(f'Método da requisição: {request.method}')
     print(f'Dados do formulário: {request.form}')
     
-    # Se for GET, redireciona para a página inicial
+    # Corrigido: GET sempre exibe a tela de login
     if request.method == 'GET':
-        print('Método GET detectado. Redirecionando para a página inicial...')
-        return redirect(url_for('index'))
-        
-    # Se for POST, processa o login
+        print('Método GET detectado. Exibindo tela de login.')
+        return render_template('login.html')
+    
+    # Se for POST, processa o login normalmente
     email = request.form.get('usuario', '').strip()
     senha = request.form.get('senha', '')
     
@@ -89,56 +84,49 @@ def login():
     if not email or not senha:
         print('Erro: Campos vazios')
         flash('Por favor, preencha todos os campos.', 'error')
-        return redirect(url_for('index'))
+        return render_template('login.html')
     
     db = get_db()
     print('Buscando usuário no banco de dados...')
-    usuario = db.execute('''
-        SELECT id_usuario AS id,
-               nome,
-               email,
-               senha,
-               cargo AS tipo
-        FROM usuarios
-        WHERE email = ?
-    ''', (email,)).fetchone()
+    usuario = db.execute('SELECT id_usuario, nome, email, senha, cargo, id_setor FROM usuarios WHERE email = ?', (email,)).fetchone()
     
     if usuario:
-        print(f'Usuário encontrado: ID={usuario["id"]}, Nome={usuario["nome"]}, Email={usuario["email"]}, Tipo={usuario["tipo"]}')
+        print(f'Usuário encontrado: ID={usuario["id_usuario"]}, Nome={usuario["nome"]}, Email={usuario["email"]}, Tipo={usuario["cargo"]}')
         print(f'Hash da senha no banco: {usuario["senha"]}')
         
-        # Verifica a senha
-        # Verifica a senha usando utilitário unificado
         senha_correta = check_password(usuario['senha'], senha)
         print(f'A senha está correta? {senha_correta}')
         
         if senha_correta:
+            print(f'Chaves disponíveis no usuário retornado: {list(usuario.keys())}')
             # Configura a sessão
-            session['user_id'] = usuario['id']
+            session['user_id'] = usuario['id_usuario']
             session['user_name'] = usuario['nome']
             session['user_email'] = usuario['email']
-            session['user_type'] = usuario['tipo']
-            session.modified = True  # Garante que a sessão seja salva
-            
-            print('\n=== SESSÃO CONFIGURADA ===')
+            session['user_type'] = usuario['cargo']
+            # Só exige id_setor para analista
+            tipo_usuario = session['user_type']
+            if tipo_usuario == 'A':
+                if 'id_setor' not in usuario.keys() or usuario['id_setor'] is None:
+                    print('ERRO: Analista sem setor associado!')
+                    flash('Erro interno: analista sem setor associado. Contate o administrador.', 'danger')
+                    return redirect(url_for('index'))
+                session['id_setor'] = usuario['id_setor']
+            else:
+                session['id_setor'] = None
+            session.modified = True
+            print('Sessão após login:', dict(session))
             print(f'Sessão após login: {dict(session)}')
             print(f'user_id: {session["user_id"]}')
             print(f'user_name: {session["user_name"]}')
             print(f'user_type: {session["user_type"]}')
-            
+            print(f'id_setor: {session["id_setor"]}')
             print('\nLogin bem-sucedido! Redirecionando para a página de gestão...')
             flash(f'Bem-vindo(a) de volta, {usuario["nome"]}!', 'success')
-            
-            # Redireciona para a rota de gestão
-            response = redirect(url_for('gestao'))
-            print(f'Headers da resposta: {response.headers}')
-            return response
-    
+            return redirect(url_for('gestao'))
     print('\nFalha no login - Credenciais inválidas')
     flash('E-mail ou senha incorretos. Tente novamente.', 'error')
-    return redirect(url_for('index'))
-        
-       
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():

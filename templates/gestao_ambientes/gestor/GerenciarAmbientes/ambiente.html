@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo_pagina or 'Sistema de Monitoramento - Sicredi' }}</title>
+    
+    <!-- Importação do Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Importação da fonte 'Inter' do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Importação do arquivo CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Gestor/GerenciarAmbientes/style.css') }}">
+    
+</head>
+<body>
+
+    <!-- link para o header -->
+    {% include 'gestao_documentos/gestor/gestor_documentos_aprovados/header.html' %}
+
+    <!-- link para os modals -->
+    {% include 'gestao_documentos/gestor/gestor_documentos_aprovados/modals.html' %}
+
+    <!-- O conteúdo da página virá aqui -->
+    <main class="p-4 sm:p-6 lg:p-8">
+        {% block conteudo %}
+        {% include 'gestao_ambientes/gestor/GerenciarAmbientes/section_add.html' %}
+        {% endblock %}
+    </main>
+
+    <!-- link para o js -->
+    <script></script>
+    <script src="{{url_for('static',filename='js/gestao_documentos/gestor/gestor_documentos_pendentes/menu.js')}}"></script>
+    <script src="{{url_for('static',filename='js/gestao_documentos/gestor/gestor_documentos_pendentes/index.js')}}"></script>
+</body>
+</html>

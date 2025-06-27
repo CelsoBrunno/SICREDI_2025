@@ -51,7 +51,9 @@ def gestao_de_materiais():
                 id_equipamento INTEGER PRIMARY KEY AUTOINCREMENT,
                 nome VARCHAR(50) NOT NULL,
                 categoria VARCHAR(50) NOT NULL,
-                status VARCHAR(1) CHECK(status IN ('D', 'U', 'M')) NOT NULL
+                id_setores INTEGER NOT NULL,
+                status VARCHAR(1) CHECK(status IN ('D', 'U', 'M')) NOT NULL,
+                FOREIGN KEY (id_setores) REFERENCES setores(id_setores)
             );
         ''')
         print("Tabela 'equipamentos' criada com sucesso ou já existente.")
@@ -108,7 +110,7 @@ def gestao_de_materiais():
             );
         ''')
         print("Tabela 'autorizacoes_acesso' criada com sucesso ou já existente.")
-
+        
     except sqlite3.Error as e:
         print(f"Erro ao acessar o banco de dados: {e}")
 

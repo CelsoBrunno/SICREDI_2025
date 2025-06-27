@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo_pagina or 'Gerenciamento de Imobilizados - Sicredi' }}</title>
+    
+    <!-- Importação do Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Importação da fonte 'Inter' do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Importação do arquivo CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gestao_equipamentos/Gestor/EquipamentosImobilizados/style.css') }}">
+
+</head>
+<body>
+
+    <!-- link para o header -->
+    {% include 'gestao_equipamentos/gestor/equipamentos_imobilizados/header.html' %}
+
+    <!-- link dos modals -->
+    {% include 'gestao_equipamentos/gestor/equipamentos_imobilizados/modals.html' %}
+
+
+    
+    <!-- O conteúdo da página virá aqui -->
+    <main class="p-4 sm:p-6 lg:p-8">
+        {% block conteudo %}
+        <!-- link para a section de título e botão de novo equipamento -->
+        {% include 'gestao_equipamentos/gestor/equipamentos_imobilizados/section_tituloNovoequipamento.html' %}
+        <!-- link para a section de lista de equipamentos -->
+        {% include 'gestao_equipamentos/gestor/equipamentos_imobilizados/section_listaEquipamentos.html' %}
+        {% endblock %}
+    </main>
+
+    <!-- link do js -->
+    <script src="{{ url_for('static', filename='js/gestao_equipamentos/gestor/EquipamentosImobilizados/script.js') }}"></script>
+    
+</body>
+</html>

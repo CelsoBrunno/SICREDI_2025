@@ -1,353 +1,116 @@
-from app.db.database import get_db_connection
+from app.db.db_connection import get_db_connection
+from flask import Blueprint, render_template, request, jsonify
 from datetime import datetime
-import sqlite3
 
-class AnalistaService:
+bp_analista_equipamentos = Blueprint('bp_analista_equipamentos', __name__, url_prefix='/gestao_equipamentos/analista')
+
+# Rotas REST para analista de equipamentos
+@bp_analista_equipamentos.route('/')
+def pagina_reserva_mobilizado():
+    equipamentos = listar_equipamentos_para_reserva()
+    return render_template('gestao_equipamentos/analista/reserva_mobilizado/equipamento.html', equipamentos=equipamentos)
+
+@bp_analista_equipamentos.route('/api/equipamentos-disponiveis', methods=['GET'])
+def api_equipamentos_disponiveis():
+    equipamentos = listar_equipamentos_para_reserva()
+    return jsonify([dict(e) for e in equipamentos])
+
+@bp_analista_equipamentos.route('/api/minhas-reservas', methods=['GET'])
+def api_minhas_reservas():
+    analista_nome = request.args.get('analista_nome', '')
+    if not analista_nome:
+        from flask import session
+        analista_nome = session.get('user_name', '')
+    reservas = listar_reservas_por_analista(analista_nome)
+    return jsonify([dict(r) for r in reservas])
+
+# Rotas alternativas para compatibilidade de frontend analista
+# Essas rotas devem ser registradas diretamente no app principal, não no blueprint.
+try:
+    from app.routes.principal.principal import app
+
+    @app.route('/analista/reservas/api/equipamentos-disponiveis', methods=['GET'])
+    def alt_api_equipamentos_disponiveis():
+        return api_equipamentos_disponiveis()
+
+    @app.route('/analista/reservas/api/minhas-reservas', methods=['GET'])
+    def alt_api_minhas_reservas():
+        return api_minhas_reservas()
+
+    @app.route('/analista/reservas/api/reservas', methods=['POST'])
+    def alt_api_criar_reserva():
+        return api_criar_reserva()
+except ImportError:
+    # Durante importações de blueprint, ignore para evitar erro circular
+    pass
+
+@bp_analista_equipamentos.route('/api/reservas', methods=['GET'])
+def api_listar_reservas():
+    analista_nome = request.args.get('analista_nome', '')
+    reservas = listar_reservas_por_analista(analista_nome)
+    return jsonify([dict(r) for r in reservas])
+
+@bp_analista_equipamentos.route('/api/reservas', methods=['POST'])
+def api_criar_reserva():
+    data = request.json
+    analista_nome = data.get('analista_nome')
+    if not analista_nome:
+        # Busca o nome do analista da sessão Flask
+        from flask import session
+        analista_nome = session.get('user_name', '')
+    reserva_id = criar_reserva(data['equipamento_id'], analista_nome, data['data_inicio'], data['data_fim'])
+    return jsonify({'id': reserva_id}), 201
+
+
+def listar_equipamentos_para_reserva():
+    """Busca todos os equipamentos disponíveis para reserva (sem reserva em análise/aprovada)."""
+    db = get_db_connection()
+    equipamentos = db.execute('''
+        SELECT e.id, e.nome
+        FROM equipamentos_mobilizados e
+        WHERE e.id NOT IN (
+            SELECT r.equipamento_id
+            FROM reservas_mobilizados r
+            WHERE r.status IN ('em_analise', 'aprovada')
+        )
+        ORDER BY e.nome
+    ''').fetchall()
+    return equipamentos
+
+def criar_reserva(equipamento_id, analista_nome, data_inicio, data_fim):
+    """Cria uma nova solicitação de reserva no banco de dados."""
+    db = get_db_connection()
+    
+    # Converte as strings de data/hora para objetos datetime
+    # O formato de entrada do datetime-local é 'YYYY-MM-DDTHH:MM'
+    inicio_dt = datetime.fromisoformat(data_inicio)
+    fim_dt = datetime.fromisoformat(data_fim)
+
+    cursor = db.execute(
+        'INSERT INTO reservas_mobilizados (equipamento_id, analista_nome, data_inicio_reserva, data_fim_reserva, status) VALUES (?, ?, ?, ?, ?)',
+        (equipamento_id, analista_nome, inicio_dt, fim_dt, 'em_analise')
+    )
+    db.commit()
+    return cursor.lastrowid
+
+def listar_reservas_por_analista(analista_nome):
     """
-    Classe com serviços para funcionalidades do analista
+    Busca todas as reservas de um analista específico, juntando com o nome do equipamento.
     """
-    
-    def __init__(self):
+    db = get_db_connection()
+    reservas = db.execute(
         """
-        Inicializa o serviço do analista
-        """
-        pass
-    
-    # ===== RESERVA DE EQUIPAMENTOS =====
-    
-    def listar_equipamentos_disponiveis(self, tipo=None):
-        """
-        Lista equipamentos disponíveis para reserva
-        Args:
-            tipo (str, optional): Tipo do equipamento ('mobilizado' ou 'imobilizado')
-        Returns:
-            list: Lista de equipamentos disponíveis
-        """
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        if tipo:
-            cursor.execute('''
-                SELECT id, nome, descricao, tipo, codigo_patrimonio, localizacao, data_criacao
-                FROM equipamentos 
-                WHERE tipo = ? AND status = 'disponivel' AND ativo = 1
-                ORDER BY nome
-            ''', (tipo,))
-        else:
-            cursor.execute('''
-                SELECT id, nome, descricao, tipo, codigo_patrimonio, localizacao, data_criacao
-                FROM equipamentos 
-                WHERE status = 'disponivel' AND ativo = 1
-                ORDER BY tipo, nome
-            ''')
-        
-        equipamentos = cursor.fetchall()
-        conn.close()
-        
-        return [dict(equipamento) for equipamento in equipamentos]
-    
-    def criar_reserva_equipamento(self, usuario_id, equipamento_id, data_inicio, data_fim, observacoes=None):
-        """
-        Cria uma nova reserva de equipamento
-        Args:
-            usuario_id (int): ID do usuário que está fazendo a reserva
-            equipamento_id (int): ID do equipamento a ser reservado
-            data_inicio (str): Data/hora de início da reserva
-            data_fim (str): Data/hora de fim da reserva
-            observacoes (str, optional): Observações da reserva
-        Returns:
-            dict: Resultado da operação
-        """
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        try:
-            # Verificar se o equipamento está disponível
-            cursor.execute('''
-                SELECT id, nome, status FROM equipamentos 
-                WHERE id = ? AND ativo = 1
-            ''', (equipamento_id,))
-            
-            equipamento = cursor.fetchone()
-            if not equipamento:
-                return {'sucesso': False, 'erro': 'Equipamento não encontrado'}
-            
-            if equipamento['status'] != 'disponivel':
-                return {'sucesso': False, 'erro': 'Equipamento não está disponível'}
-            
-            # Verificar se já existe uma reserva conflitante
-            cursor.execute('''
-                SELECT id FROM reservas 
-                WHERE equipamento_id = ? 
-                AND status IN ('pendente', 'aprovada')
-                AND (
-                    (data_inicio <= ? AND data_fim >= ?) OR
-                    (data_inicio <= ? AND data_fim >= ?) OR
-                    (data_inicio >= ? AND data_fim <= ?)
-                )
-            ''', (equipamento_id, data_inicio, data_inicio, data_fim, data_fim, data_inicio, data_fim))
-            
-            conflito = cursor.fetchone()
-            if conflito:
-                return {'sucesso': False, 'erro': 'Já existe uma reserva para este período'}
-            
-            # Criar a reserva
-            cursor.execute('''
-                INSERT INTO reservas (usuario_id, equipamento_id, data_inicio, data_fim, observacoes)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (usuario_id, equipamento_id, data_inicio, data_fim, observacoes))
-            
-            conn.commit()
-            reserva_id = cursor.lastrowid
-            
-            conn.close()
-            return {'sucesso': True, 'id': reserva_id, 'mensagem': 'Reserva criada com sucesso. Aguarde aprovação do gestor.'}
-            
-        except sqlite3.Error as e:
-            conn.close()
-            return {'sucesso': False, 'erro': f'Erro ao criar reserva: {str(e)}'}
-    
-    def listar_minhas_reservas(self, usuario_id, status=None):
-        """
-        Lista as reservas do analista
-        Args:
-            usuario_id (int): ID do usuário
-            status (str, optional): Filtrar por status
-        Returns:
-            list: Lista de reservas do usuário
-        """
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        if status:
-            cursor.execute('''
-                SELECT r.id, r.data_inicio, r.data_fim, r.status, r.observacoes, r.data_criacao,
-                       e.nome as equipamento_nome, e.codigo_patrimonio, e.tipo as equipamento_tipo,
-                       a.nome as ambiente_nome
-                FROM reservas r
-                LEFT JOIN equipamentos e ON r.equipamento_id = e.id
-                LEFT JOIN ambientes a ON r.ambiente_id = a.id
-                WHERE r.usuario_id = ? AND r.status = ?
-                ORDER BY r.data_criacao DESC
-            ''', (usuario_id, status))
-        else:
-            cursor.execute('''
-                SELECT r.id, r.data_inicio, r.data_fim, r.status, r.observacoes, r.data_criacao,
-                       e.nome as equipamento_nome, e.codigo_patrimonio, e.tipo as equipamento_tipo,
-                       a.nome as ambiente_nome
-                FROM reservas r
-                LEFT JOIN equipamentos e ON r.equipamento_id = e.id
-                LEFT JOIN ambientes a ON r.ambiente_id = a.id
-                WHERE r.usuario_id = ?
-                ORDER BY r.data_criacao DESC
-            ''', (usuario_id,))
-        
-        reservas = cursor.fetchall()
-        conn.close()
-        
-        return [dict(reserva) for reserva in reservas]
-    
-    def cancelar_reserva(self, reserva_id, usuario_id):
-        """
-        Cancela uma reserva do analista
-        Args:
-            reserva_id (int): ID da reserva
-            usuario_id (int): ID do usuário (para verificar se é o dono da reserva)
-        Returns:
-            dict: Resultado da operação
-        """
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        try:
-            # Verificar se a reserva pertence ao usuário e pode ser cancelada
-            cursor.execute('''
-                SELECT id, status FROM reservas 
-                WHERE id = ? AND usuario_id = ?
-            ''', (reserva_id, usuario_id))
-            
-            reserva = cursor.fetchone()
-            if not reserva:
-                return {'sucesso': False, 'erro': 'Reserva não encontrada ou você não tem permissão para cancelá-la'}
-            
-            if reserva['status'] in ['cancelada', 'rejeitada']:
-                return {'sucesso': False, 'erro': 'Esta reserva já foi cancelada ou rejeitada'}
-            
-            # Cancelar a reserva
-            cursor.execute('''
-                UPDATE reservas 
-                SET status = 'cancelada', data_atualizacao = ?
-                WHERE id = ?
-            ''', (datetime.now(), reserva_id))
-            
-            # Se a reserva estava aprovada, liberar o equipamento
-            if reserva['status'] == 'aprovada':
-                cursor.execute('''
-                    UPDATE equipamentos 
-                    SET status = 'disponivel'
-                    WHERE id = (SELECT equipamento_id FROM reservas WHERE id = ?)
-                ''', (reserva_id,))
-            
-            conn.commit()
-            conn.close()
-            return {'sucesso': True, 'mensagem': 'Reserva cancelada com sucesso'}
-            
-        except sqlite3.Error as e:
-            conn.close()
-            return {'sucesso': False, 'erro': f'Erro ao cancelar reserva: {str(e)}'}
-    
-    # ===== ACESSO A AMBIENTES =====
-    
-    def listar_ambientes_disponiveis(self):
-        """
-        Lista todos os ambientes disponíveis
-        Returns:
-            list: Lista de ambientes
-        """
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            SELECT id, nome, descricao, capacidade, equipamentos, data_criacao
-            FROM ambientes 
-            WHERE ativo = 1
-            ORDER BY nome
-        ''')
-        
-        ambientes = cursor.fetchall()
-        conn.close()
-        
-        return [dict(ambiente) for ambiente in ambientes]
-    
-    def criar_reserva_ambiente(self, usuario_id, ambiente_id, data_inicio, data_fim, observacoes=None):
-        """
-        Cria uma nova reserva de ambiente
-        Args:
-            usuario_id (int): ID do usuário que está fazendo a reserva
-            ambiente_id (int): ID do ambiente a ser reservado
-            data_inicio (str): Data/hora de início da reserva
-            data_fim (str): Data/hora de fim da reserva
-            observacoes (str, optional): Observações da reserva
-        Returns:
-            dict: Resultado da operação
-        """
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        try:
-            # Verificar se o ambiente existe
-            cursor.execute('''
-                SELECT id, nome FROM ambientes 
-                WHERE id = ? AND ativo = 1
-            ''', (ambiente_id,))
-            
-            ambiente = cursor.fetchone()
-            if not ambiente:
-                return {'sucesso': False, 'erro': 'Ambiente não encontrado'}
-            
-            # Verificar se já existe uma reserva conflitante
-            cursor.execute('''
-                SELECT id FROM reservas 
-                WHERE ambiente_id = ? 
-                AND status IN ('pendente', 'aprovada')
-                AND (
-                    (data_inicio <= ? AND data_fim >= ?) OR
-                    (data_inicio <= ? AND data_fim >= ?) OR
-                    (data_inicio >= ? AND data_fim <= ?)
-                )
-            ''', (ambiente_id, data_inicio, data_inicio, data_fim, data_fim, data_inicio, data_fim))
-            
-            conflito = cursor.fetchone()
-            if conflito:
-                return {'sucesso': False, 'erro': 'Já existe uma reserva para este período'}
-            
-            # Criar a reserva
-            cursor.execute('''
-                INSERT INTO reservas (usuario_id, ambiente_id, data_inicio, data_fim, observacoes)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (usuario_id, ambiente_id, data_inicio, data_fim, observacoes))
-            
-            conn.commit()
-            reserva_id = cursor.lastrowid
-            
-            conn.close()
-            return {'sucesso': True, 'id': reserva_id, 'mensagem': 'Reserva de ambiente criada com sucesso. Aguarde aprovação do gestor.'}
-            
-        except sqlite3.Error as e:
-            conn.close()
-            return {'sucesso': False, 'erro': f'Erro ao criar reserva de ambiente: {str(e)}'}
-    
-    def verificar_disponibilidade_ambiente(self, ambiente_id, data_inicio, data_fim):
-        """
-        Verifica se um ambiente está disponível em um período
-        Args:
-            ambiente_id (int): ID do ambiente
-            data_inicio (str): Data/hora de início
-            data_fim (str): Data/hora de fim
-        Returns:
-            dict: Resultado da verificação
-        """
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        try:
-            # Verificar conflitos de reserva
-            cursor.execute('''
-                SELECT COUNT(*) as conflitos FROM reservas 
-                WHERE ambiente_id = ? 
-                AND status IN ('pendente', 'aprovada')
-                AND (
-                    (data_inicio <= ? AND data_fim >= ?) OR
-                    (data_inicio <= ? AND data_fim >= ?) OR
-                    (data_inicio >= ? AND data_fim <= ?)
-                )
-            ''', (ambiente_id, data_inicio, data_inicio, data_fim, data_fim, data_inicio, data_fim))
-            
-            resultado = cursor.fetchone()
-            disponivel = resultado['conflitos'] == 0
-            
-            conn.close()
-            return {
-                'disponivel': disponivel,
-                'mensagem': 'Ambiente disponível' if disponivel else 'Ambiente ocupado neste período'
-            }
-            
-        except sqlite3.Error as e:
-            conn.close()
-            return {
-                'disponivel': False,
-                'mensagem': f'Erro ao verificar disponibilidade: {str(e)}'
-            }
-    
-    def obter_historico_reservas(self, usuario_id, limite=10):
-        """
-        Obtém o histórico de reservas do analista
-        Args:
-            usuario_id (int): ID do usuário
-            limite (int): Limite de registros a retornar
-        Returns:
-            list: Lista com histórico de reservas
-        """
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            SELECT r.id, r.data_inicio, r.data_fim, r.status, r.observacoes, r.data_criacao,
-                   e.nome as equipamento_nome, e.codigo_patrimonio,
-                   a.nome as ambiente_nome,
-                   CASE 
-                       WHEN r.equipamento_id IS NOT NULL THEN 'equipamento'
-                       WHEN r.ambiente_id IS NOT NULL THEN 'ambiente'
-                   END as tipo_reserva
-            FROM reservas r
-            LEFT JOIN equipamentos e ON r.equipamento_id = e.id
-            LEFT JOIN ambientes a ON r.ambiente_id = a.id
-            WHERE r.usuario_id = ?
-            ORDER BY r.data_criacao DESC
-            LIMIT ?
-        ''', (usuario_id, limite))
-        
-        reservas = cursor.fetchall()
-        conn.close()
-        
-        return [dict(reserva) for reserva in reservas]
+        SELECT 
+            r.id, 
+            r.data_inicio_reserva, 
+            r.data_fim_reserva, 
+            r.status,
+            e.nome as equipamento_nome
+        FROM reservas_mobilizados r
+        JOIN equipamentos_mobilizados e ON r.equipamento_id = e.id
+        WHERE r.analista_nome = ?
+        ORDER BY r.data_inicio_reserva DESC
+        """,
+        (analista_nome,)
+    ).fetchall()
+    return reservas

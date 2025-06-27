@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambientes - Analista</title>
+    <!-- Importação do Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Gestor/GerenciarAmbientes/style.css') }}">
+    <style>
+      .ambiente-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #0001; padding: 1.5rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+      .ambiente-info { flex: 1; }
+      .ambiente-nome { font-size: 1.2rem; font-weight: 600; }
+      .ambiente-localizacao { font-size: 1rem; color: #666; }
+      .ambiente-setor { font-size: 0.95rem; color: #3b8114; }
+      .btn-entrar { background: #3b8114; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+      .btn-entrar:hover { background: #326d11; }
+      .btn-sair { background: #e53e3e; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+      .btn-sair:hover { background: #b91c1c; }
+      .modal-block { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0008; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+      .modal-content { background: #fff; border-radius: 10px; padding: 2rem 2.5rem; text-align: center; box-shadow: 0 2px 16px #0004; }
+    </style>
+</head>
+<body style="background: #f5f6fa; min-height: 100vh;">
+    {% include 'gestao_equipamentos/analista/reserva_mobilizado/header.html' %}
+    <main style="max-width: 700px; margin: 0 auto; padding: 2rem;">
+        <div id="ambientes-list"></div>
+    </main>
+    <!-- Modal de Bloqueio -->
+    <div id="modal-bloqueio" class="modal-block" style="display:none;">
+      <div class="modal-content">
+        <i class="fas fa-ban fa-3x text-red-500 mb-3"></i>
+        <h2 style="color:#e53e3e; margin-bottom:1rem;">Acesso Negado</h2>
+        <p id="modal-bloqueio-msg">Você não pertence ao setor deste ambiente.</p>
+        <button onclick="document.getElementById('modal-bloqueio').style.display='none'" class="btn-entrar" style="margin-top:1.5rem;">OK</button>
+      </div>
+    </div>
+    <script>
+let ambientes = [];
+let ambienteAtual = null;
+let idSetorAnalista = null;
+
+// Busca info do analista logado
+async function fetchAnalistaInfo() {
+    const res = await fetch('/gestao_ambientes/analista/api/me');
+    if (!res.ok) return null;
+    return await res.json();
+}
+
+// Busca ambientes
+async function fetchAmbientes() {
+    const res = await fetch('/gestao_ambientes/analista/api/ambientes');
+    return res.ok ? await res.json() : [];
+}
+
+// Busca ambiente atual do analista
+async function fetchAmbienteAtual() {
+    const res = await fetch('/gestao_ambientes/analista/api/ambiente_atual');
+    if (!res.ok) return null;
+    return await res.json();
+}
+
+// Renderiza cards
+function renderAmbientes() {
+    const list = document.getElementById('ambientes-list');
+    list.innerHTML = '';
+    ambientes.forEach(amb => {
+        const card = document.createElement('div');
+        card.className = 'ambiente-card';
+        card.innerHTML = `
+          <div class="ambiente-info">
+            <div class="ambiente-nome">${amb.nome}</div>
+            <div class="ambiente-localizacao">${amb.localizacao || ''}</div>
+            <div class="ambiente-setor">Setor: ${amb.nome_setor || ''}</div>
+          </div>
+          <button class="${amb.id===ambienteAtual?.id ? 'btn-sair' : 'btn-entrar'}" data-id="${amb.id}">
+            ${amb.id===ambienteAtual?.id ? 'Sair' : 'Entrar'}
+          </button>
+        `;
+        // Botão Entrar/Sair
+        card.querySelector('button').onclick = async function() {
+            if (amb.id === ambienteAtual?.id) {
+                await sairAmbiente();
+            } else {
+                if (amb.id_setor != idSetorAnalista) {
+                    document.getElementById('modal-bloqueio-msg').textContent = 'Você não pertence ao setor deste ambiente.';
+                    document.getElementById('modal-bloqueio').style.display = 'flex';
+                    return;
+                }
+                if (ambienteAtual) {
+                    document.getElementById('modal-bloqueio-msg').textContent = 'Você só pode estar em um ambiente por vez. Saia do ambiente atual antes de entrar em outro.';
+                    document.getElementById('modal-bloqueio').style.display = 'flex';
+                    return;
+                }
+                await entrarAmbiente(amb.id);
+            }
+            await atualizar();
+        };
+        list.appendChild(card);
+    });
+}
+
+async function entrarAmbiente(id) {
+    await fetch('/gestao_ambientes/analista/api/entrar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_ambiente: id })
+    });
+}
+
+async function sairAmbiente() {
+    await fetch('/gestao_ambientes/analista/api/sair', {
+        method: 'POST' });
+}
+
+async function atualizar() {
+    const [info, ambs, atual] = await Promise.all([
+        fetchAnalistaInfo(),
+        fetchAmbientes(),
+        fetchAmbienteAtual()
+    ]);
+    idSetorAnalista = info?.id_setor;
+    ambientes = ambs;
+    ambienteAtual = atual;
+    renderAmbientes();
+}
+
+document.addEventListener('DOMContentLoaded', atualizar);
+    </script>
+</body>
+</html>

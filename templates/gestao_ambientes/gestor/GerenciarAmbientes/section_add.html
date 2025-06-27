@@ -1,0 +1,289 @@
+<!-- Seção de título e botão Novo Ambiente -->
+<section class="mb-6" aria-label="Título e ação principal">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+        <h1 class="text-2xl font-bold text-gray-800">Gerenciamento de Ambientes</h1>
+        <button id="add-environment-btn" type="button" class="mt-4 sm:mt-0 flex items-center justify-center bg-[#3b8114] hover:bg-[#326d11] text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Novo Ambiente
+        </button>
+    </div>
+</section>
+
+<!-- Seção da Lista de Ambientes -->
+<section aria-label="Lista de Ambientes">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Localização</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="environments-table-body" class="bg-white divide-y divide-gray-200">
+                    <!-- Linhas da tabela serão inseridas aqui via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Modal para Adicionar/Editar Ambiente -->
+<div id="environment-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
+<div id="environment-modal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg transform transition-all opacity-0 translate-y-4" id="environment-modal-content">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 id="modal-title" class="text-xl font-bold text-gray-800">Adicionar Novo Ambiente</h2>
+        </div>
+        <form id="environment-form" class="p-6 space-y-4">
+            <input type="hidden" id="environment-id" name="id">
+            <div>
+                <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Ambiente</label>
+                <input type="text" name="nome" id="nome" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Ex: Laboratório de Redes">
+            </div>
+            <div>
+                <label for="localizacao" class="block text-sm font-medium text-gray-700">Localização</label>
+                <input type="text" name="localizacao" id="localizacao" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Ex: Bloco C, Sala 101">
+            </div>
+            <div>
+                <label for="id_setor" class="block text-sm font-medium text-gray-700">Setor Responsável</label>
+                <select id="id_setor" name="id_setor" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="">Carregando setores...</option>
+                </select>
+            </div>
+            <div class="pt-4 flex justify-end space-x-3">
+                <button type="button" id="cancel-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-300">Cancelar</button>
+                <button type="submit" id="save-btn" class="bg-[#3b8114] hover:bg-[#326d11] text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Confirmação para Excluir -->
+<div id="delete-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
+<div id="delete-modal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm transform transition-all opacity-0 translate-y-4" id="delete-modal-content">
+        <div class="p-6 text-center">
+            <svg class="mx-auto mb-4 w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <h3 class="mb-5 text-lg font-normal text-gray-600">Tem certeza que deseja excluir este ambiente?</h3>
+            <div class="flex justify-center gap-4">
+                 <button id="cancel-delete-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-lg transition duration-300">Cancelar</button>
+                 <button id="confirm-delete-btn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-300">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Elementos do DOM ---
+    const addEnvironmentBtn = document.getElementById('add-environment-btn');
+    const tableBody = document.getElementById('environments-table-body');
+
+    // Elementos do Modal de Ambiente
+    const envModalOverlay = document.getElementById('environment-modal-overlay');
+    const envModal = document.getElementById('environment-modal');
+    const envModalContent = document.getElementById('environment-modal-content');
+    const modalTitle = document.getElementById('modal-title');
+    const envForm = document.getElementById('environment-form');
+    const envIdInput = document.getElementById('environment-id');
+    const sectorSelect = document.getElementById('id_setor');
+    const cancelBtn = document.getElementById('cancel-btn');
+
+    // Elementos do Modal de Exclusão
+    const deleteModalOverlay = document.getElementById('delete-modal-overlay');
+    const deleteModal = document.getElementById('delete-modal');
+    const deleteModalContent = document.getElementById('delete-modal-content');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    let environmentToDeleteId = null;
+
+    // --- Funções de API ---
+    const API_URL = '/gestao_ambientes/gestor/api';
+
+    async function fetchApi(url, options = {}) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ erro: `Erro HTTP: ${response.status}` }));
+                throw new Error(errorData.erro || `Erro HTTP: ${response.status}`);
+            }
+            if (response.status === 204) { // No Content
+                return null;
+            }
+            return response.json();
+        } catch (error) {
+            console.error('Falha na API:', error);
+            // Poderia adicionar uma notificação de erro para o usuário aqui
+            throw error;
+        }
+    }
+
+    // --- Funções do Modal ---
+    function openModal(modal, overlay, content) {
+        modal.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+        setTimeout(() => { // Para a transição funcionar
+            content.classList.remove('opacity-0', 'translate-y-4');
+            content.classList.add('opacity-100', 'translate-y-0');
+        }, 10);
+    }
+
+    function closeModal(modal, overlay, content) {
+        content.classList.add('opacity-0', 'translate-y-4');
+        content.classList.remove('opacity-100', 'translate-y-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            overlay.classList.add('hidden');
+        }, 300); // Duração da transição
+    }
+
+    // --- Funções de Renderização ---
+    function renderTable(environments) {
+        tableBody.innerHTML = ''; // Limpa a tabela
+        if (!environments || environments.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500 py-4">Nenhum ambiente encontrado.</td></tr>`;
+            return;
+        }
+        environments.forEach(env => {
+            const row = `
+                <tr id="env-row-${env.id}">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${env.nome}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-600">${env.localizacao || 'Não informada'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                        <button data-id="${env.id}" class="edit-btn text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out">Editar</button>
+                        <button data-id="${env.id}" class="delete-btn text-red-600 hover:text-red-900 transition duration-150 ease-in-out">Excluir</button>
+                    </td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    async function loadEnvironments() {
+        try {
+            const environments = await fetchApi(`${API_URL}/ambientes`);
+            renderTable(environments);
+        } catch (error) {
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center text-red-500 py-4">Falha ao carregar ambientes.</td></tr>`;
+        }
+    }
+
+    async function loadSectors() {
+        try {
+            const sectors = await fetchApi(`${API_URL}/setores`);
+            sectorSelect.innerHTML = '<option value="">Selecione um setor</option>'; // Limpa e adiciona placeholder
+            sectors.forEach(sector => {
+                const option = `<option value="${sector.id_setor}">${sector.nome_setor}</option>`;
+                sectorSelect.insertAdjacentHTML('beforeend', option);
+            });
+        } catch (error) {
+            sectorSelect.innerHTML = '<option value="">Erro ao carregar setores</option>';
+        }
+    }
+
+
+    // --- Manipuladores de Eventos ---
+
+    // Abrir modal para NOVO ambiente
+    addEnvironmentBtn.addEventListener('click', () => {
+        envForm.reset();
+        envIdInput.value = '';
+        modalTitle.textContent = 'Adicionar Novo Ambiente';
+        sectorSelect.value = ''; // Reseta o select
+        openModal(envModal, envModalOverlay, envModalContent);
+    });
+
+    // Abrir modal para EDITAR ou EXCLUIR ambiente (usando delegação de evento)
+    tableBody.addEventListener('click', async (e) => {
+        const target = e.target;
+        const id = target.dataset.id;
+
+        if (target.classList.contains('edit-btn')) {
+            envForm.reset();
+            modalTitle.textContent = 'Editar Ambiente';
+            
+            // Aqui você pode buscar os dados completos do ambiente se necessário,
+            // ou usar os dados já disponíveis se a lista inicial for suficiente.
+            // Para este exemplo, vamos usar os dados da linha.
+            const row = document.getElementById(`env-row-${id}`);
+            const nome = row.cells[0].textContent.trim();
+            const localizacao = row.cells[1].textContent.trim();
+            
+            // Idealmente, a API de GET /ambientes retornaria o id_setor
+            // Para preencher, precisaríamos de uma rota GET /ambientes/<id>
+            // ou que a lista já viesse com essa informação.
+            // Por enquanto, vamos preencher o que temos:
+            document.getElementById('nome').value = nome;
+            document.getElementById('localizacao').value = localizacao;
+            envIdInput.value = id;
+            sectorSelect.value = ''; // Limpa o setor, pois não temos essa info na tabela. O usuário precisará selecionar novamente.
+
+            openModal(envModal, envModalOverlay, envModalContent);
+        }
+
+        if (target.classList.contains('delete-btn')) {
+            environmentToDeleteId = id;
+            openModal(deleteModal, deleteModalOverlay, deleteModalContent);
+        }
+    });
+
+    // Fechar modais
+    [envModalOverlay, cancelBtn].forEach(el => el.addEventListener('click', () => closeModal(envModal, envModalOverlay, envModalContent)));
+    [deleteModalOverlay, cancelDeleteBtn].forEach(el => el.addEventListener('click', () => closeModal(deleteModal, deleteModalOverlay, deleteModalContent)));
+
+
+    // Submeter formulário de Adicionar/Editar
+    envForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = envIdInput.value;
+        const formData = new FormData(envForm);
+        const data = Object.fromEntries(formData.entries());
+
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${API_URL}/ambientes/${id}` : `${API_URL}/ambientes`;
+
+        try {
+            await fetchApi(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            closeModal(envModal, envModalOverlay, envModalContent);
+            loadEnvironments(); // Recarrega a tabela
+        } catch (error) {
+            alert(`Erro ao salvar ambiente: ${error.message}`);
+        }
+    });
+
+    // Confirmar exclusão
+    confirmDeleteBtn.addEventListener('click', async () => {
+        if (!environmentToDeleteId) return;
+
+        try {
+            await fetchApi(`${API_URL}/ambientes/${environmentToDeleteId}`, { method: 'DELETE' });
+            closeModal(deleteModal, deleteModalOverlay, deleteModalContent);
+            loadEnvironments(); // Recarrega a tabela
+        } catch(error) {
+            alert(`Erro ao excluir ambiente: ${error.message}`);
+        } finally {
+            environmentToDeleteId = null;
+        }
+    });
+
+
+    // --- Inicialização ---
+    function initialize() {
+        loadEnvironments();
+        loadSectors();
+    }
+
+    initialize();
+});
+</script>

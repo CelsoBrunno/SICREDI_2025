@@ -1,0 +1,24 @@
+<!-- Seção para a Lista de Equipamentos -->
+<section class="bg-white p-4 sm:p-6 rounded-lg shadow-md" aria-label="Lista de Equipamentos Mobilizados">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+            </thead>
+            <!-- O corpo da tabela será preenchido dinamicamente pelo JavaScript -->
+            <tbody id="equipment-table-body" class="bg-white divide-y divide-gray-200">
+                <!-- Linha de exemplo para carregamento/estado vazio -->
+                <tr id="loading-row">
+                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                        Carregando equipamentos...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

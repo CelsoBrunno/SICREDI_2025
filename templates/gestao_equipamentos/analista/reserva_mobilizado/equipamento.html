@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo_pagina or 'Reserva de Equipamentos - Sicredi' }}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-100">
+
+    {% include 'gestao_equipamentos/analista/reserva_mobilizado/header.html' %}
+    {% include 'gestao_equipamentos/analista/reserva_mobilizado/modals.html' %}
+    
+    <main class="p-4 sm:p-6 lg:p-8">
+        {% block conteudo %}
+        {% include 'gestao_equipamentos/analista/reserva_mobilizado/section_solicitarReserva.html' %}
+        {% include 'gestao_equipamentos/analista/reserva_mobilizado/section_listarReserva.html' %}
+        {% endblock %}
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- Seletores de Elementos ---
+        const reservationForm = document.getElementById('request-reservation-form');
+        const equipmentSelect = document.getElementById('reserva-equip');
+        const myReservationsTableBody = document.getElementById('my-reservations-table-body');
+        
+        // --- Funções de API ---
+
+        /**
+         * Busca a lista de equipamentos disponíveis e preenche o seletor.
+         */
+        const fetchAndRenderAvailableEquipment = async () => {
+            try {
+                const response = await fetch('/analista/reservas/api/equipamentos-disponiveis');
+                if (!response.ok) throw new Error('Falha ao buscar equipamentos.');
+                
+                const equipamentos = await response.json();
+                
+                // Limpa opções existentes (exceto a primeira que é o placeholder)
+                equipmentSelect.innerHTML = '<option value="" disabled selected>Selecione um item...</option>';
+                
+                equipamentos.forEach(equip => {
+                    const option = document.createElement('option');
+                    option.value = equip.id;
+                    option.textContent = equip.nome;
+                    equipmentSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar equipamentos:', error);
+                equipmentSelect.innerHTML = '<option value="" disabled>Erro ao carregar</option>';
+            }
+        };
+
+        /**
+         * Busca as reservas do analista e renderiza a tabela.
+         */
+        const fetchAndRenderMyReservations = async () => {
+            try {
+                const response = await fetch('/analista/reservas/api/minhas-reservas');
+                if (!response.ok) throw new Error('Falha ao buscar reservas.');
+
+                const reservas = await response.json();
+                renderReservationsTable(reservas);
+
+            } catch (error) {
+                console.error('Erro ao carregar reservas:', error);
+                myReservationsTableBody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-red-600">Erro ao carregar suas reservas.</td></tr>`;
+            }
+        };
+
+        /**
+         * Renderiza os dados na tabela de "Minhas Reservas".
+         * @param {Array} reservas - Lista de objetos de reserva.
+         */
+        const renderReservationsTable = (reservas) => {
+            myReservationsTableBody.innerHTML = ''; // Limpa a tabela
+            if (reservas.length === 0) {
+                myReservationsTableBody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-gray-500">Nenhum pedido de reserva realizado.</td></tr>`;
+                return;
+            }
+
+            const statusMap = {
+                'em_analise': {label: 'Em análise', style: 'bg-yellow-100 text-yellow-800'},
+                'aprovada': {label: 'Aprovada', style: 'bg-green-100 text-green-800'},
+                'recusada': {label: 'Recusada', style: 'bg-red-100 text-red-800'}
+            };
+
+            reservas.forEach(reserva => {
+                // Formata as datas para exibição
+                const inicio = new Date(reserva.data_inicio_reserva).toLocaleString('pt-BR');
+                const fim = new Date(reserva.data_fim_reserva).toLocaleString('pt-BR');
+                const statusInfo = statusMap[reserva.status] || {label: reserva.status, style: 'bg-gray-100 text-gray-800'};
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${reserva.equipamento_nome}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">De: ${inicio}<br>Até: ${fim}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusInfo.style}">
+                            ${statusInfo.label}
+                        </span>
+                    </td>
+                `;
+                myReservationsTableBody.appendChild(tr);
+            });
+        };
+
+        // --- Manipuladores de Eventos ---
+
+        // Submissão do formulário de solicitação de reserva
+        reservationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                equipamento_id: document.getElementById('reserva-equip').value,
+                data_inicio: document.getElementById('reserva-inicio').value,
+                data_fim: document.getElementById('reserva-fim').value
+            };
+
+            // Validação simples
+            if (!data.equipamento_id || !data.data_inicio || !data.data_fim) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/analista/reservas/api/reservas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Solicitação de reserva enviada com sucesso!');
+                    reservationForm.reset();
+                    fetchAndRenderMyReservations(); // Atualiza a lista de reservas
+                } else {
+                    throw new Error(result.error || 'Erro desconhecido.');
+                }
+
+            } catch(error) {
+                alert(`Erro ao enviar solicitação: ${error.message}`);
+                console.error('Erro no formulário de reserva:', error);
+            }
+        });
+        
+        // --- Inicialização ---
+        fetchAndRenderAvailableEquipment();
+        fetchAndRenderMyReservations();
+    });
+    </script>
+
+</body>
+</html>

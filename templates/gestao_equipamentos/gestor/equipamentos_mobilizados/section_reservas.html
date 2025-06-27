@@ -1,0 +1,25 @@
+<!-- Section para listar reservas de equipamentos mobilizados -->
+<section class="bg-white p-4 sm:p-6 rounded-lg shadow-md mt-8" aria-label="Reservas de Equipamentos Mobilizados">
+    <h2 class="text-lg font-semibold mb-4">Reservas de Equipamentos Mobilizados</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipamento</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Analista</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Início</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Fim</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="reservas-table-body" class="bg-white divide-y divide-gray-200">
+                <tr id="loading-reservas-row">
+                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                        Carregando reservas...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

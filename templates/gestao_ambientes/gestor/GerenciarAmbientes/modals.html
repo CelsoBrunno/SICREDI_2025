@@ -1,0 +1,204 @@
+<!-- ========== MENU LATERAL (MODAL) ACESSÍVEL ========== -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+<div id="sidebar-menu" class="fixed top-0 left-0 h-full w-72 bg-white shadow-xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="flex items-center justify-between p-4 border-b">
+        <div class="flex items-center flex-shrink-0">
+             <img class="h-8 w-auto" src="/static/img/logo-verde.png" alt="Logo Sicredi"
+            onerror="this.onerror=null; this.src='https://placehold.co/150x40/000000/ffffff?text=Sicredi';">
+             <span class="ml-3 font-semibold text-lg text-gray-800">Sicredi</span>
+        </div>
+        <button id="close-menu-btn" class="p-2 rounded-full hover:bg-gray-200">
+            <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+    <nav class="p-4">
+        <ul>
+            <li><a href="#" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100"><span class="ml-3">Reserva de Equipamentos</span></a></li>
+            <li><a href="{{ url_for('bp_gestor_equipamentos.pagina_mobilizados') }}" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100"><span class="ml-3">Gestão de Imobilizado</span></a></li>
+            <li><a href="#" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100"><span class="ml-3">Controle de Acessos</span></a></li>
+            <li><a href="{{ url_for('bp_gestor_equipamentos.pagina_mobilizados') }}" class="flex items-center p-3 text-gray-700 rounded-lg hover:bg-gray-100"><span class="ml-3">Gestão de Mobilizado</span></a></li>
+        </ul>
+    </nav>
+</div>
+
+<!-- ========== MODAL NOVO AMBIENTE ========== -->
+<div id="add-environment-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+<div id="add-environment-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 w-full max-w-md hidden">
+    <form id="add-environment-form">
+        <div class="flex items-center justify-between p-4 border-b">
+            <h3 class="text-xl font-semibold text-gray-800">Adicionar Novo Ambiente</h3>
+            <button type="button" id="close-add-modal-btn" class="p-2 rounded-full hover:bg-gray-200">
+                 <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="p-6">
+            <div class="mb-4">
+                <label for="ambiente-nome" class="block text-sm font-medium text-gray-700 mb-1">Nome do Ambiente</label>
+                <input type="text" id="ambiente-nome" name="ambiente-nome" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#3b8114] focus:border-[#3b8114]" placeholder="Ex: Sala de Reuniões 1" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Setor Responsável</label>
+                <div id="setores-container" class="max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-2">
+                    <!-- Setores serão carregados via JS -->
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center justify-end p-4 border-t bg-gray-50 rounded-b-lg">
+            <button id="cancel-add-modal-btn" type="button" class="bg-white hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm mr-2">
+                Cancelar
+            </button>
+            <button type="submit" class="bg-[#3b8114] hover:bg-[#326d11] text-white font-semibold py-2 px-4 rounded-lg shadow-md">
+                Salvar Ambiente
+            </button>
+        </div>
+    </form>
+</div>
+<script>
+// Carrega setores do backend e popula radios
+
+document.addEventListener('DOMContentLoaded', () => {
+    carregarSetores();
+    configurarModalAmbiente();
+    carregarAmbientes();
+});
+
+function carregarAmbientes() {
+    fetch('/gestao_ambientes/gestor/api/ambientes')
+        .then(res => {
+            if (!res.ok) throw new Error('Erro ao carregar ambientes');
+            return res.json();
+        })
+        .then(ambientes => {
+            const tbody = document.getElementById('environments-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (ambientes.length === 0) {
+                tbody.innerHTML = '<tr id="placeholder-row"><td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum ambiente cadastrado.</td></tr>';
+                return;
+            }
+            ambientes.forEach(amb => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${amb.nome}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${amb.localizacao || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(err => {
+            const tbody = document.getElementById('environments-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr id="error-row"><td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm text-red-500 text-center">Erro ao carregar ambientes: ' + err.message + '</td></tr>';
+        });
+}
+
+function carregarSetores() {
+    fetch('/gestao_ambientes/gestor/api/setores')
+        .then(res => {
+            if (!res.ok) throw new Error('Erro ao carregar setores');
+            return res.json();
+        })
+        .then(setores => {
+            const container = document.getElementById('setores-container');
+            if (!container) return;
+            container.innerHTML = '';
+            setores.forEach((setor, idx) => {
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'id_setor';
+                radio.value = setor.id_setor;
+                radio.id = 'setor-' + setor.id_setor;
+                radio.required = true;
+                if (idx === 0) radio.checked = true;
+                radio.onclick = function() {
+                    document.querySelectorAll('input[name="id_setor"]').forEach(r => {
+                        if (r !== radio) r.checked = false;
+                    });
+                };
+                const label = document.createElement('label');
+                label.htmlFor = radio.id;
+                label.textContent = setor.nome_setor;
+                label.className = 'ml-2';
+                const div = document.createElement('div');
+                div.className = 'flex items-center';
+                div.appendChild(radio);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        })
+        .catch(err => {
+            const container = document.getElementById('setores-container');
+            if (!container) return;
+            container.innerHTML = '<div class="text-red-500">Erro ao carregar setores: ' + err.message + '</div>';
+        });
+}
+
+function configurarModalAmbiente() {
+    const modal = document.getElementById('add-environment-modal');
+    const btnCancelar = document.getElementById('cancel-add-modal-btn');
+    const btnFechar = document.getElementById('close-add-modal-btn');
+    const overlay = document.getElementById('add-environment-overlay');
+    const form = document.getElementById('add-environment-form');
+    if (!modal || !btnCancelar || !btnFechar || !overlay || !form) return;
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        overlay.classList.add('hidden');
+        form.reset();
+    }
+    btnCancelar.onclick = closeModal;
+    btnFechar.onclick = closeModal;
+    overlay.onclick = closeModal;
+
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        let nome = '';
+        if (form['ambiente-nome']) {
+            nome = form['ambiente-nome'].value;
+        } else {
+            const nomeInput = form.querySelector('input[name="ambiente-nome"], input[id="ambiente-nome"]');
+            if (nomeInput) nome = nomeInput.value;
+        }
+        const id_setor = form.querySelector('input[name="id_setor"]:checked')?.value;
+        if (!nome) {
+            alert('Informe o nome do ambiente!');
+            return;
+        }
+        if (!id_setor || isNaN(parseInt(id_setor))) {
+            alert('Selecione um setor!');
+            return;
+        }
+        fetch('/gestao_ambientes/gestor/api/ambientes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, id_setor: parseInt(id_setor) })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Erro ao cadastrar ambiente');
+            return res.json();
+        })
+        .then(() => {
+            closeModal();
+            carregarAmbientes();
+        })
+        .catch(err => {
+            alert('Erro ao cadastrar ambiente: ' + err.message);
+        });
+    }
+}
+</script>
+
+<div id="delete-confirm-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+<div id="delete-confirm-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 w-full max-w-sm hidden">
+    <div class="p-6 text-center">
+        <svg class="mx-auto mb-4 h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        <h3 class="mb-5 text-lg font-normal text-gray-600">Tem certeza que deseja excluir este ambiente?</h3>
+        <button id="confirm-delete-btn" type="button" class="text-white bg-red-600 hover:bg-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+            Sim, tenho certeza
+        </button>
+        <button id="cancel-delete-btn" type="button" class="text-gray-500 bg-white hover:bg-gray-100 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900">
+            Cancelar
+        </button>
+    </div>
+</div>

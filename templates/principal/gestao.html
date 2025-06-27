@@ -9,21 +9,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
-{# {% if avisos_nao_lidos %} #}
-  {% include "gestao_avisos/analista/painel_avisos/painel.html" %}
-{# {% endif %} #}
-  
   <div class="sidebar">
     <div class="sidebar-header">  
       <!-- mude a linkagem para jinja flask -->
-      <img src="{{ url_for('static', filename='img/sicredi.jpeg') }}" alt="Logo Sicredi" class="logo">
+      <img src="{{ url_for('static', filename='img/logo-branca.png') }}" alt="Logo Sicredi" class="logo">
     </div>
     <nav class="sidebar-nav">
       <ul>
         <li class="active"><a href="#"><i class="fas fa-home"></i> <span>Início</span></a></li>
         <li><a href="{{ url_for('analista.documentos_pendentes') }}"><i class="fas fa-file-alt"></i> <span>Documentos</span></a></li>
-        <li><a href="#"><i class="fas fa-box"></i> <span>Materiais</span></a></li>
+        <li><a href="{{ url_for('bp_analista_equipamentos.pagina_reserva_mobilizado') }}"><i class="fas fa-box"></i> <span>Materiais</span></a></li>
         {% if session.user_type == 'G' %}
         <li><a href="#"><i class="fas fa-bullhorn"></i> <span>Avisos</span></a></li>
         <li><a href="{{ url_for('gestor_ambientes.pagina_ambientes') }}"><i class="fas fa-building"></i> <span>Gerenciar Ambientes</span></a></li>
@@ -207,8 +202,24 @@
         </div>
       </a>
       
-      <!-- Cartão de Monitoramento de Materiais -->
-      <a href="#" class="opcao-gestao">
+      {% if session.user_type == 'G' %}
+      <!-- Card: Equipamentos Imobilizados (Gestor) -->
+      <a href="{{ url_for('bp_gestor_equipamentos.pagina_imobilizados') }}" class="opcao-gestao">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-box"></i>
+          </div>
+        </div>
+        <h2>Equipamentos Imobilizados</h2>
+        <p>Gerencie os equipamentos imobilizados da cooperativa</p>
+        <div class="card-footer">
+          <span>Acessar agora</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
+      {% else %}
+      <!-- Card: Monitoramento de Materiais (Analista) -->
+      <a href="{{ url_for('bp_analista_equipamentos.pagina_reserva_mobilizado') }}" class="opcao-gestao">
         <div class="card-header">
           <div class="card-icon">
             <i class="fas fa-box"></i>
@@ -221,6 +232,24 @@
           <i class="fas fa-arrow-right"></i>
         </div>
       </a>
+      {% endif %}
+
+      {% if session.user_type == 'A' %}
+      <a href="{{ url_for('analista_ambientes.pagina_ambientes') }}" class="opcao-gestao">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-door-open"></i>
+          </div>
+          <div class="card-badge">Novo</div>
+        </div>
+        <h2>Ambientes</h2>
+        <p>Visualize e entre em ambientes disponíveis do seu setor.</p>
+        <div class="card-footer">
+          <span>Acessar agora</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
+      {% endif %}
 
       
     </main>
