@@ -1,0 +1,39 @@
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/gestao_avisos/analista/painel.css') }}">
+  <title>Aviso com Verificação</title>
+</head>
+
+<body>
+
+  <!-- Overlay que aparece antes de o usuário interagir -->
+  <div class="overlay" id="overlay">
+    <img src="image.png" class="img-sicred1" alt="Ícone">
+    <div class="box" id="box">
+      <div class="icone"></div>
+      <h2 class="avisos">Aviso</h2>
+      <div class="hidden-content">
+        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit et voluptates dolorem? 
+          Delectus magnam nobis velit, aspernatur ipsa fugiat, placeat, maiores odio distinctio labore doloribus. 
+          Voluptatem molestiae veritatis eum accusantium?</p>
+        <button id="btnLido">Lido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Div onde o conteúdo do site aparece após o overlay ser escondido -->
+  <div id="conteudoSite" style="display: none;">
+    <h1>Painel de Avisos</h1>
+    <!-- Adicione aqui o conteúdo específico da página -->
+  </div>
+
+  <!-- Incluir o arquivo aviso.js -->
+  <script src="{{ url_for('static', filename='js/gestao_avisos/analista/aviso.js') }}"></script>
+
+</body>
+{% endblock %}

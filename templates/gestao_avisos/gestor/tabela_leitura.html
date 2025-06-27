@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabela de Avisos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/gestao_avisos/gestor//tabela.css') }}">
+</head>
+<body>
+  <!-- <img src="image.png" class="img-sicred1" alt="Ícone"> -->
+
+  <div class="container">
+    <img src="image.png" class="img-sicred2" alt="Ícone">
+    <h1 class="titulo">Leitura de Avisos</h1>
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Setor</th>
+          <th>Data</th>
+          <th>Lido?</th>
+        </tr>     
+      </thead>
+      <tbody id="tabela-corpo">
+        <tr>
+          <td contenteditable="true">João Silva</td>
+          <td contenteditable="true">Financeiro</td>
+          <td contenteditable="true">23/06/2025</td>
+          <td class="check-cell"><input type="checkbox"></td>
+        </tr>
+      </tbody>
+      
+    <!-- </table>
+    <button id="adicionarLinha">Adicionar Linha</button>
+  </div> -->
+
+  <script>
+
+    const btn = document.getElementById('adicionarLinha');
+    const corpo = document.getElementById('tabela-corpo');
+
+    btn.addEventListener('click', () => {
+      const novaLinha = document.createElement('tr');
+      novaLinha.innerHTML = `
+        <td contenteditable="true">Novo Nome</td>
+        <td contenteditable="true">Novo Setor</td>
+        <td contenteditable="true">DD/MM/AAAA</td>
+        <td class="check-cell"><input type="checkbox"></td>
+      `;
+
+      corpo.appendChild(novaLinha);
+    });
+  </script>
+</body>
+</html>
